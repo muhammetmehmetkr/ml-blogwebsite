@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Prediction Result</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Prediction Input:</h5>
+                <div>Age: <span id="n1"></span></div>
+                <div>Medu: <span id="n2"></span></div>
+                <div>Fedu: <span id="n3"></span></div>
+                <div>Failures: <span id="n4"></span></div>
+                <div>Freetime: <span id="n5"></span></div>
+                <div>Go out: <span id="n6"></span></div>
+                <div>Walc: <span id="n7"></span></div>
+                <div>Absences: <span id="n8"></span></div>
+                <div>G1: <span id="n9"></span></div>
+                <div>G2: <span id="n10"></span></div>
+                <h5 class="pt-3">Prediction Classification:</h5>
+                <div id="prediction"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!--<a class="btn btn-primary" href="/predict/results" role="button">Results</a>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pt-3">
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <h3>Student Performance Prediction</h3>
+            <form action="" id="post-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="text" class="form-control" id="age" placeholder="Enter an integer between 15-22" required>
+                </div>
+                <div class="form-group">
+                    <label for="Medu">Medu</label>
+                    <input type="text" class="form-control" id="Medu" placeholder="Enter an integer between 0-4" required>
+                </div>
+                <div class="form-group">
+                    <label for="Fedu">Fedu</label>
+                    <input type="text" class="form-control" id="Fedu" placeholder="Enter an integer between 0-4" required>
+                </div>
+                <div class="form-group">
+                    <label for="failures">Failures</label>
+                    <input type="text" class="form-control" id="failures" placeholder="Enter an integer between 0-3" required>
+                </div>
+                <div class="form-group">
+                    <label for="freetime">Freetime</label>
+                    <input type="text" class="form-control" id="freetime" placeholder="Enter an integer between 1-5" required>
+                </div>
+                <div class="form-group">
+                    <label for="goout">Go out</label>
+                    <input type="text" class="form-control" id="goout" placeholder="Enter an integer between 1-5" required>
+                </div>
+                <div class="form-group">
+                    <label for="Walc">Walc</label>
+                    <input type="text" class="form-control" id="Walc" placeholder="Enter an integer between 1-5" required>
+                </div>
+                <div class="form-group">
+                    <label for="absences">Absences</label>
+                    <input type="text" class="form-control" id="absences" placeholder="Enter an integer between 0-75" required>
+                </div>
+                <div class="form-group">
+                    <label for="G1">G1</label>
+                    <input type="text" class="form-control" id="G1" placeholder="Enter an integer between 0-20" required>
+                </div>
+                <div class="form-group">
+                    <label for="G2">G2</label>
+                    <input type="text" class="form-control" id="G2" placeholder="Enter an integer between 0-20" required>
+                </div>
+                <button type="submit" value="Submit" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('submit', '#post-form',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'POST',
+            url:'{% url "predict:submit_prediction" %}',
+            data:{
+                age:$('#age').val(),
+                Medu:$('#Medu').val(),
+                Fedu:$('#Fedu').val(),
+                failures:$('#failures').val(),
+                freetime:$('#freetime').val(),
+                goout:$('#goout').val(),
+                Walc:$('#Walc').val(),
+                absences:$('#absences').val(),
+                G1:$('#G1').val(),
+                G2:$('#G2').val(),                
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                action: 'post'
+            },
+            success:function(json) {
+                document.forms["post-form"].reset();
+                document.getElementById("prediction").innerHTML = json['result']
+                document.getElementById("n1").innerHTML = json['age']
+                document.getElementById("n2").innerHTML = json['Medu']
+                document.getElementById("n3").innerHTML = json['Fedu']
+                document.getElementById("n4").innerHTML = json['failures']
+                document.getElementById("n5").innerHTML = json['freetime']
+                document.getElementById("n6").innerHTML = json['goout']
+                document.getElementById("n7").innerHTML = json['Walc']
+                document.getElementById("n8").innerHTML = json['absences']
+                document.getElementById("n9").innerHTML = json['G1']
+                document.getElementById("n10").innerHTML = json['G2']
+            },
+            error : function(xhr,errmsg,err) {
+
+            }
+        });
+    })
+</script>
+
+{% endblock body %}
